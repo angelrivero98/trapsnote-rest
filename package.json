@@ -1,0 +1,37 @@
+{
+  "name": "equipo-2",
+  "version": "1.0.0",
+  "description": "Version Final del repositorio",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "mongodb": "^2.2.5",
+    "mongoose": "^4.5.9"
+  },
+  "devDependencies": {
+    "expect": "^1.20.2",
+    "mocha": "^3.0.2",
+    "nodemon": "^1.10.2",
+    "supertest": "^2.0.0"
+  },
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "mocha server/**/*.test.js",
+
+    "test-watch" : "nodemon --exec 'npm test' "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angelrivero98/Equipo-2.git"
+  },
+  "engines" : {
+    "node" : "8.6.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/angelrivero98/Equipo-2/issues"
+  },
+  "homepage": "https://github.com/angelrivero98/Equipo-2#readme"
+}
