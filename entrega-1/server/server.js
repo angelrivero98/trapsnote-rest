@@ -1,6 +1,7 @@
 const _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
+var md5 = require('md5');
 
 var {mongoose} = require('./db/mongoose');
 var {Tarea} = require('./models/tarea');
@@ -30,8 +31,12 @@ app.post('/tareas', (req, res) => {
 
 //Guarda un nuevo usuario en db mandada por servidor
 app.post('/usuarios', (req, res) => {
-  var body= _.pick(req.body,['name','last_name','email','password']);
-  var usuario = new Usuario(body);
+  var usuario = new Usuario({
+    name: req.body.name,
+    last_name: req.body.last_name,
+    email: req.body.email,
+    password: md5(req.body.password)
+  });
 
   usuario.save().then((usuario) => {
     res.status(200).send(usuario);
