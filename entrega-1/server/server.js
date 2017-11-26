@@ -30,7 +30,7 @@ app.post('/tareas', (req, res) => {
 
 //Guarda un nuevo usuario en db mandada por servidor
 app.post('/usuarios', (req, res) => {
-  var body= _.pick(req.body,['username','nombre','apellido','email','password']);
+  var body= _.pick(req.body,['name','last_name','email','password']);
   var usuario = new Usuario(body);
 
   usuario.save().then((usuario) => {
