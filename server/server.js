@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var md5 = require('md5');
 
 var {mongoose} = require('./db/mongoose');
 var {Tarea} = require('./models/tarea');
@@ -32,7 +33,7 @@ app.post('/usuarios', (req, res) => {
     name: req.body.name,
     last_name: req.body.last_name,
     email: req.body.email,
-    password: req.body.password
+    password: md5(req.body.password)
   });
 
   usuario.save().then((doc) => {
