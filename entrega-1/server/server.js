@@ -1,3 +1,4 @@
+const _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
 
@@ -12,6 +13,7 @@ const port = process.env.PORT || 3000;
 
 //Manda un json a restAPI
 app.use(bodyParser.json());
+app.use(express.urlencoded());
 
 //Guarda una nueva tarea en db mandada por servidor
 app.post('/tareas', (req, res) => {
@@ -28,15 +30,11 @@ app.post('/tareas', (req, res) => {
 
 //Guarda un nuevo usuario en db mandada por servidor
 app.post('/usuarios', (req, res) => {
-  var usuario = new Usuario({
-    name: req.body.name,
-    last_name: req.body.last_name,
-    email: req.body.email,
-    password: req.body.password
-  });
+  var body= _.pick(req.body,['username','nombre','apellido','email','password']);
+  var usuario = new Usuario(body);
 
-  usuario.save().then((doc) => {
-    res.status(200).send(doc);
+  usuario.save().then((usuario) => {
+    res.status(200).send(usuario);
   }, (err) => {
     res.status(400).send(err);
   })
