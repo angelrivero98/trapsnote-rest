@@ -1,5 +1,6 @@
 var mongoose = require("mongoose");
 
+
 const validator = require("validator");
 //Constructor de usuarios
 var Usuario = mongoose.model('Usuario', {
@@ -36,6 +37,7 @@ var Usuario = mongoose.model('Usuario', {
     },
     message: '{VALUE} no es un email valido'
   }
+
   },
   password: {
     type: String,
@@ -49,6 +51,7 @@ var Usuario = mongoose.model('Usuario', {
     },
     message: '{VALUE} la contraseña debe ser alfanumerica'
   }
+
   }
 });
 

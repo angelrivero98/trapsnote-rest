@@ -6,6 +6,7 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
+    "md5": "^2.2.1",
     "mongodb": "^2.2.5",
     "mongoose": "^4.5.9"
   },
@@ -16,17 +17,16 @@
     "supertest": "^2.0.0"
   },
   "scripts": {
-    "start": "node entrega-1/server/server.js",
+    "start": "node server/server.js",
     "test": "mocha server/**/*.test.js",
-
-    "test-watch" : "nodemon --exec 'npm test' "
+    "test-watch": "nodemon --exec 'npm test' "
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/angelrivero98/Equipo-2.git"
+    "url": "git+https://github.com/angelrivero98/trapsnote-rest.git"
   },
-  "engines" : {
-    "node" : "8.6.0"
+  "engines": {
+    "node": "8.6.0"
   },
   "author": "",
   "license": "ISC",
