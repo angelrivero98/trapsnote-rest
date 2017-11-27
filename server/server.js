@@ -1,6 +1,9 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 
+var md5 = require('md5');
+
+
 var {mongoose} = require('./db/mongoose');
 var {Tarea} = require('./models/tarea');
 var {Usuario} = require('./models/usuario');
@@ -32,7 +35,9 @@ app.post('/usuarios', (req, res) => {
     name: req.body.name,
     last_name: req.body.last_name,
     email: req.body.email,
-    password: req.body.password
+
+    password: md5(req.body.password)
+
   });
 
   usuario.save().then((doc) => {
@@ -42,7 +47,10 @@ app.post('/usuarios', (req, res) => {
   })
 });
 
-//Obtiene usuarios del servidor
+
+
+//Obtiene un usuario del servidor
+
 app.get('/usuarios',(req,res)=>{
   Usuario.find().then((usuarios) =>{
     res.send({usuarios});
@@ -69,6 +77,7 @@ app.get('/tareas',(req,res)=>{
   })
 });
 
+
 //Obtiene una usuario según su id
 app.get('/usuarios/:id', (req, res) => {
   var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
@@ -83,6 +92,9 @@ app.get('/usuarios/:id', (req, res) => {
   }).catch((e) => res.status(400).send()); // Si hubo un error lo atrapa y devuelve una respuesta 400
 });
 
+
+//Obtiene una tarea según su id
+
 app.get('/tareas/:id', (req, res) => {
   var id = req.params.id;
   if (!ObjectID.isValid(id)) {
@@ -93,8 +105,12 @@ app.get('/tareas/:id', (req, res) => {
       return res.status(400).send();
     }
     res.send({tarea});
+
   }).catch((e) => res.status(400).send());
 });
+
+
+
 //Crea el Servidor
 
 app.listen(port, () => {
