@@ -29,7 +29,6 @@ app.post('/tareas', (req, res) => {
 //Guarda un nuevo usuario en db mandada por servidor
 app.post('/usuarios', (req, res) => {
   var usuario = new Usuario({
-    username :req.body.username,
     name: req.body.name,
     last_name: req.body.last_name,
     email: req.body.email,
@@ -74,7 +73,7 @@ app.get('/tareas',(req,res)=>{
 app.get('/usuarios/:id', (req, res) => {
   var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
   if (!ObjectID.isValid(id)) {
-    return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404 
+    return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
   }
   Usuario.findById(id).then((usuario) => { //Se realiza la busqueda del usuario por ID
     if (!usuario) {
