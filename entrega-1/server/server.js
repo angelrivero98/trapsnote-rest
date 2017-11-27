@@ -1,6 +1,9 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 
+var md5 = require('md5');
+
+
 var {mongoose} = require('./db/mongoose');
 var {Tarea} = require('./models/tarea');
 var {Usuario} = require('./models/usuario');
@@ -32,7 +35,9 @@ app.post('/usuarios', (req, res) => {
     name: req.body.name,
     last_name: req.body.last_name,
     email: req.body.email,
-    password: req.body.password
+
+    password: md5(req.body.password)
+
   });
 
   usuario.save().then((doc) => {
@@ -42,7 +47,10 @@ app.post('/usuarios', (req, res) => {
   })
 });
 
+
+
 //Obtiene un usuario del servidor
+
 app.get('/usuarios',(req,res)=>{
   Usuario.find().then((usuarios) =>{
     res.send({usuarios});
@@ -69,7 +77,24 @@ app.get('/tareas',(req,res)=>{
   })
 });
 
+
+//Obtiene una usuario según su id
+app.get('/usuarios/:id', (req, res) => {
+  var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
+  }
+  Usuario.findById(id).then((usuario) => { //Se realiza la busqueda del usuario por ID
+    if (!usuario) {
+      return res.status(404).send(); // Si el usuario no existe devuelve una respuesta 404
+    }
+    res.send({usuario}); // Si todo estuvo bien, devuelve el usuario
+  }).catch((e) => res.status(400).send()); // Si hubo un error lo atrapa y devuelve una respuesta 400
+});
+
+
 //Obtiene una tarea según su id
+
 app.get('/tareas/:id', (req, res) => {
   var id = req.params.id;
   if (!ObjectID.isValid(id)) {
@@ -80,8 +105,10 @@ app.get('/tareas/:id', (req, res) => {
       return res.status(400).send();
     }
     res.send({tarea});
-  }).catch((err) => res.status(400).send());
+
+  }).catch((e) => res.status(400).send());
 });
+
 
 
 //Crea el Servidor
