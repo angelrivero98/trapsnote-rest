@@ -69,15 +69,6 @@ app.get('/tareas', (req,res) => {
 });
 
 
-app.get('/tareas',(req,res)=>{
-  Tarea.find().then((tareas) =>{
-    res.send({tareas});
-  }, (e) => {
-    res.status(400).send(e);
-  })
-});
-
-
 //Obtiene una usuario según su id
 app.get('/usuarios/:id', (req, res) => {
   var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
