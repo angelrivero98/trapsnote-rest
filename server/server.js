@@ -68,6 +68,17 @@ app.get('/tareas', (req,res) => {
   });
 });
 
+app.get('/usuarios/:username', (req, res) => {
+  var username = req.params.username;
+  Usuario.findOne({
+    username: username
+  }).then((usuario) => { //Se realiza la busqueda del usuario por username
+    if (!usuario) {
+      return res.status(404).send(); // Si el usuario no existe devuelve una respuesta 404
+    }
+    res.send({usuario}); // Si todo estuvo bien, devuelve el usuario
+  }).catch((e) => res.status(400).send()); // Si hubo un error lo atrapa y devuelve una respuesta 400
+});
 
 //Obtiene una usuario según su id
 app.get('/usuarios/:id', (req, res) => {
