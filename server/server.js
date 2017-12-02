@@ -69,6 +69,7 @@ app.get('/tareas', (req,res) => {
   });
 });
 
+//Obtiene un usuario por el username ya que por id, la WebApp, no sabra el id
 app.get('/usuarios/:username', (req, res) => {
   var username = req.params.username;
   Usuario.findOne({
