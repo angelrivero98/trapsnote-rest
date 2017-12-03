@@ -4,7 +4,9 @@ var mongoose = require("mongoose");
 const validator = require("validator");
 //Constructor de usuarios
 var Usuario = mongoose.model('Usuario', {
+
   username:{  //Campo del nombre de usuario, donde se valida que sea unico
+
     type: String,
     required: true,
     minlength: 1,
@@ -60,8 +62,15 @@ var Usuario = mongoose.model('Usuario', {
     message: '{VALUE} la contraseña debe ser alfanumerica'
   }
 
+  },
+
+  intentos: {
+    type: Number
+  },
+
+  bloqueado: {
+    type: Boolean
   }
 });
-
 
 module.exports = {Usuario};
