@@ -122,10 +122,10 @@ app.delete('/usuarios/:username', (req,res) => {
     }).catch((e) => res.status(400).send());
 });
 
-app.patch('/usuarios/:username',(req,res) =>{
+app.patch('/usuarios/:username',(req,res) =>{ // solo se puede modificar el nombre, apellido y la clave
   var username = req.params.username;
-  var body = _.pick(req.body,['name','last_name','password']);
-  Usuario.findOneAndUpdate({username: username},{$set: body},{new: true}).then((usuario)=> {
+  var body = _.pick(req.body,['name','last_name','password']); // en una variable body se ingresan los valores que se van a modificar
+  Usuario.findOneAndUpdate({username: username},{$set: body},{new: true}).then((usuario)=> { // Funcion que busca el usuario y le modifica los valores que se declararon en body
     if (!usuario) {
       return res.status(404).send(); // Si el usuario no existe devuelve una respuesta 404
     }
