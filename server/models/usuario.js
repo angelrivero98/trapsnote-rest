@@ -4,7 +4,9 @@ var mongoose = require("mongoose");
 const validator = require("validator");
 //Constructor de usuarios
 var Usuario = mongoose.model('Usuario', {
-  username: {
+
+  username:{  //Campo del nombre de usuario, donde se valida que sea unico
+
     type: String,
     required: true,
     minlength: 1,
