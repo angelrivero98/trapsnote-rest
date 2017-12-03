@@ -7,7 +7,6 @@ var md5 = require('md5');
 var {mongoose} = require('./db/mongoose');
 var {Tarea} = require('./models/tarea');
 var {Usuario} = require('./models/usuario');
-var {TipoError} = require('./controllers/errorHandling')
 const {ObjectID} = require('mongodb');
 
 var app = express();
@@ -71,11 +70,13 @@ app.post('/usuarios', (req, res) => {
     bloqueado: false
   });
 
-  usuario.save().then((doc) => {
-    res.status(200).send(doc);
-  }, (err) => {
-    res.status(400).send(err);
-  })
+  usuario.save().then(() => {
+   return usuario.generateAuthToken();
+ }).then((token)=>{
+  res.header('x-auth',token).send(usuario);
+ }).catch((e)=>{
+   res.status(400).send(e);
+ })
 });
 
 

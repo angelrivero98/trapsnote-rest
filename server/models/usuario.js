@@ -2,8 +2,9 @@ var mongoose = require("mongoose");
 
 
 const validator = require("validator");
-//Constructor de usuarios
-var Usuario = mongoose.model('Usuario', {
+const jwt = require('jsonwebtoken');
+const _ =require('lodash');
+var UserSchema= new mongoose.Schema({
 
   username:{  //Campo del nombre de usuario, donde se valida que sea unico
 
@@ -70,7 +71,34 @@ var Usuario = mongoose.model('Usuario', {
 
   bloqueado: {
     type: Boolean
-  }
+  },
+  tokens:[{
+    access:{
+      type: String,
+      required:true
+    },
+    token:{
+      type: String,
+      required:true
+    }
+  }]
 });
+UserSchema.methods.toJSON=function(){
+  var usuario=this;
+  var userObject = usuario.toObject();
+  return _.pick(userObject,['_id','username','name','last_name','email']);
+};
+UserSchema.methods.generateAuthToken= function(){
+  var usuario=this;
+  var access= 'auth';
+  var token = jwt.sign({id: usuario._id.toHexString(),access},'trapsnote').toString();
+
+  usuario.tokens.push({access,token});
+  return usuario.save().then(()=>{
+     return token;
+  });
+};
+//Constructor de usuarios
+var Usuario = mongoose.model('Usuario', UserSchema);
 
 module.exports = {Usuario};
