@@ -2,7 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 
 var md5 = require('md5');
-
+const _ = require('lodash');
 
 var {mongoose} = require('./db/mongoose');
 var {Tarea} = require('./models/tarea');
@@ -18,6 +18,7 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 app.post('/login', (req, res) => {
+
 var body= _.pick(req.body,['email','password']);
  Usuario.findByCredentials(body.email,body.password).then((usuario)=>{
   return usuario.generateAuthToken().then((token)=>{
@@ -26,6 +27,7 @@ var body= _.pick(req.body,['email','password']);
  }).catch((e)=>{
   res.status(400).send();
  });
+
 });
 
 //Guarda una nueva tarea en db mandada por servidor
@@ -93,7 +95,9 @@ app.get('/tareas', (req,res) => {
   });
 });
 
+
 //Obtiene un usuario por el username ya que por id, la WebApp, no sabra el id
+
 app.get('/usuarios/:username', (req, res) => {
   var username = req.params.username;
   Usuario.findOne({
@@ -105,6 +109,31 @@ app.get('/usuarios/:username', (req, res) => {
     res.send({usuario}); // Si todo estuvo bien, devuelve el usuario
   }).catch((e) => res.status(400).send()); // Si hubo un error lo atrapa y devuelve una respuesta 400
 });
+
+
+app.delete('/usuarios/:username', (req,res) => {
+    var username = req.params.username;
+    Usuario.findOneAndRemove({  //Similar al findOne, solamente que lo elimina de la db
+      username: username
+    }).then((usuario) => { //Se realiza la busqueda del usuario por username
+      if (!usuario) {
+        return res.status(404).send(); // Si el usuario no existe devuelve una respuesta 404
+      }
+      res.send({usuario}); // Si todo estuvo bien, devuelve el usuario
+    }).catch((e) => res.status(400).send());
+});
+
+app.patch('/usuarios/:username',(req,res) =>{ // solo se puede modificar el nombre, apellido y la clave
+  var username = req.params.username;
+  var body = _.pick(req.body,['name','last_name','password']); // en una variable body se ingresan los valores que se van a modificar
+  Usuario.findOneAndUpdate({username: username},{$set: body},{new: true}).then((usuario)=> { // Funcion que busca el usuario y le modifica los valores que se declararon en body
+    if (!usuario) {
+      return res.status(404).send(); // Si el usuario no existe devuelve una respuesta 404
+    }
+    res.send({usuario}); // Si todo estuvo bien, devuelve el usuario
+  }).catch((e) => res.status(400).send());
+});
+
 
 //Obtiene una usuario según su id
 app.get('/usuarios/:id', (req, res) => {

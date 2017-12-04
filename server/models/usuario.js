@@ -2,6 +2,7 @@ var mongoose = require("mongoose");
 
 
 const validator = require("validator");
+
 const jwt = require('jsonwebtoken');
 const _ =require('lodash');
 var md5 = require('md5');
