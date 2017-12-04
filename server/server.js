@@ -7,9 +7,9 @@ var md5 = require('md5');
 var {mongoose} = require('./db/mongoose');
 var {Tarea} = require('./models/tarea');
 var {Usuario} = require('./models/usuario');
-var {TipoError} = require('./controllers/errorHandling')
+var {authenticate}= require('./middleware/authenticate');
 const {ObjectID} = require('mongodb');
-
+const _ =require('lodash');
 var app = express();
 
 const port = process.env.PORT || 3000;
@@ -18,32 +18,14 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 app.post('/login', (req, res) => {
-  var usuario = new Usuario({
-    email: req.body.email,
-    password: req.body.password
-  });
-  var password = usuario.password;
-  var email = usuario.email;
-  Usuario.findOne({ email: email }).then((usuario) => {
-    if (!usuario) {
-      res.status(500).send();
-    }
-    if (md5(password) != usuario.password) {
-      console.log('Contraseña incorrecta');
-      if (usuario.intentos < 5) {
-        usuario.intentos++;
-        usuario.save();
-      } else {
-        usuario.bloqueado = true;
-        usuario.save();
-      }
-      res.status(400).send();
-    } else {
-      usuario.intentos = 0;
-      usuario.save();
-      res.send({usuario});
-    }
-  }).catch((e) => res.status(400).send());
+var body= _.pick(req.body,['email','password']);
+ Usuario.findByCredentials(body.email,body.password).then((usuario)=>{
+  return usuario.generateAuthToken().then((token)=>{
+   res.header('x-auth',token).send(usuario);
+ });
+ }).catch((e)=>{
+  res.status(400).send();
+ });
 });
 
 //Guarda una nueva tarea en db mandada por servidor
@@ -71,14 +53,26 @@ app.post('/usuarios', (req, res) => {
     bloqueado: false
   });
 
-  usuario.save().then((doc) => {
-    res.status(200).send(doc);
-  }, (err) => {
-    res.status(400).send(err);
-  })
+  usuario.save().then(() => {
+   return usuario.generateAuthToken();
+ }).then((token)=>{
+  res.header('x-auth',token).send(usuario);
+ }).catch((e)=>{
+   res.status(400).send(e);
+ })
 });
 
+app.get('/usuarios/me',authenticate,(req,res)=>{
+ res.send(req.usuario);
+});
 
+app.delete('/usuarios/me/token',authenticate,(req,res)=>{
+  req.usuario.removeToken(req.token).then(()=>{
+    res.status(200).send();
+  },()=>{
+    res.status(400).send();
+  });
+});
 
 //Obtiene los usuarios del servidor
 
@@ -142,10 +136,6 @@ app.get('/tareas/:id', (req, res) => {
 
   }).catch((e) => res.status(400).send());
 });
-
-
-
-//Crea el Servidor
 
 app.listen(port, () => {
   console.log(`Servidor iniciado en port ${port}`);
