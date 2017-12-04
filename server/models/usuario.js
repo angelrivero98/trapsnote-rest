@@ -2,9 +2,14 @@ var mongoose = require("mongoose");
 
 
 const validator = require("validator");
-//Constructor de usuarios
-var Usuario = mongoose.model('Usuario', {
+
+const jwt = require('jsonwebtoken');
+const _ =require('lodash');
+var md5 = require('md5');
+var UserSchema= new mongoose.Schema({
+
   username:{  //Campo del nombre de usuario, donde se valida que sea unico
+
     type: String,
     required: true,
     minlength: 1,
@@ -60,8 +65,82 @@ var Usuario = mongoose.model('Usuario', {
     message: '{VALUE} la contraseña debe ser alfanumerica'
   }
 
-  }
-});
+  },
 
+  intentos: {
+    type: Number
+  },
+
+  bloqueado: {
+    type: Boolean
+  },
+  tokens:[{
+    access:{
+      type: String,
+      required:true
+    },
+    token:{
+      type: String,
+      required:true
+    }
+  }]
+});
+UserSchema.methods.toJSON=function(){
+  var usuario=this;
+  var userObject = usuario.toObject();
+  return _.pick(userObject,['_id','username','name','last_name','email']);
+};
+UserSchema.methods.generateAuthToken= function(){
+  var usuario=this;
+  var access= 'auth';
+  var token = jwt.sign({id: usuario._id.toHexString(),access},'trapsnote').toString();
+
+  usuario.tokens.push({access,token});
+  return usuario.save().then(()=>{
+     return token;
+  });
+};
+UserSchema.methods.removeToken = function(token){
+  var usuario = this;
+return  usuario.update({
+    $pull:{
+      tokens:{
+        token: token
+      }
+    }
+  });
+};
+UserSchema.statics.findByCredentials= function (email,password){
+  var Usuario =this;
+  return Usuario.findOne({email}).then((usuario)=>{
+    if(!usuario){
+      return Promise.reject();
+    }
+    return new Promise((resolve,reject)=>{
+      if(md5(password)!=usuario.password){
+        reject();
+      }else{
+        resolve(usuario);
+      }
+    });
+  });
+};
+UserSchema.statics.findByToken=function(token){
+  var Usuario=this;
+  var decoded;
+
+  try{
+    decoded = jwt.verify(token,'trapsnote');
+  }catch(e){
+   console.log('errortoken');
+   return Promise.reject();
+  }
+  return Usuario.findOne({
+    'tokens.token':token,
+    'tokens.access':'auth'
+  });
+};
+//Constructor de usuarios
+var Usuario = mongoose.model('Usuario', UserSchema);
 
 module.exports = {Usuario};
