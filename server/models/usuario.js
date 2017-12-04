@@ -99,6 +99,16 @@ UserSchema.methods.generateAuthToken= function(){
      return token;
   });
 };
+UserSchema.methods.removeToken = function(token){
+  var usuario = this;
+return  usuario.update({
+    $pull:{
+      tokens:{
+        token: token
+      }
+    }
+  });
+};
 UserSchema.statics.findByCredentials= function (email,password){
   var Usuario =this;
   return Usuario.findOne({email}).then((usuario)=>{

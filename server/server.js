@@ -66,6 +66,14 @@ app.get('/usuarios/me',authenticate,(req,res)=>{
  res.send(req.usuario);
 });
 
+app.delete('/usuarios/me/token',authenticate,(req,res)=>{
+  req.usuario.removeToken(req.token).then(()=>{
+    res.status(200).send();
+  },()=>{
+    res.status(400).send();
+  });
+});
+
 //Obtiene los usuarios del servidor
 
 app.get('/usuarios',(req,res)=>{
