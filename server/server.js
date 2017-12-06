@@ -9,7 +9,6 @@ var {Tarea} = require('./models/tarea');
 var {Usuario} = require('./models/usuario');
 var {authenticate}= require('./middleware/authenticate');
 const {ObjectID} = require('mongodb');
-const _ =require('lodash');
 var app = express();
 
 const port = process.env.PORT || 3000;
