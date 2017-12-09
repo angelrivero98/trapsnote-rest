@@ -3,16 +3,23 @@ var bodyParser = require('body-parser');
 
 var md5 = require('md5');
 const _ = require('lodash');
-
 var {mongoose} = require('./db/mongoose');
 var {Tarea} = require('./models/tarea');
 var {Usuario} = require('./models/usuario');
 var {authenticate}= require('./middleware/authenticate');
 const {ObjectID} = require('mongodb');
 var app = express();
+var moment = require('moment');
+moment().format();
+
+var prueba = function (){
+  var fecha = new Date();
+  console.log(fecha.toDateString());
+  console.log(moment({y:2010,M:10,d:12}).fromNow(true));
+}
 
 const port = process.env.PORT || 3000;
-
+prueba();
 //Manda un json a restAPI
 app.use(bodyParser.json());
 
