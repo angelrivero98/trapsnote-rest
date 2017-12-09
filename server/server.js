@@ -7,19 +7,10 @@ var {mongoose} = require('./db/mongoose');
 var {Tarea} = require('./models/tarea');
 var {Usuario} = require('./models/usuario');
 var {authenticate}= require('./middleware/authenticate');
-const {ObjectID} = require('mongodb');
+const {ObjectID} = require('mongodb'); // mongod --config /usr/local/etc/mongod.conf
 var app = express();
-var moment = require('moment');
-moment().format();
-
-var prueba = function (){
-  var fecha = new Date();
-  console.log(fecha.toDateString());
-  console.log(moment({y:2010,M:10,d:12}).fromNow(true));
-}
-
 const port = process.env.PORT || 3000;
-prueba();
+
 //Manda un json a restAPI
 app.use(bodyParser.json());
 
@@ -57,6 +48,7 @@ app.post('/usuarios', (req, res) => {
     last_name: req.body.last_name,
     email: req.body.email,
     password: md5(req.body.password),
+    fechaDeNacimiento:req.body.fechaDeNacimiento,
     intentos: 0,
     bloqueado: false
   });
