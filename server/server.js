@@ -3,14 +3,12 @@ var bodyParser = require('body-parser');
 
 var md5 = require('md5');
 const _ = require('lodash');
-
 var {mongoose} = require('./db/mongoose');
 var {Tarea} = require('./models/tarea');
 var {Usuario} = require('./models/usuario');
 var {authenticate}= require('./middleware/authenticate');
-const {ObjectID} = require('mongodb');
+const {ObjectID} = require('mongodb'); // mongod --config /usr/local/etc/mongod.conf
 var app = express();
-
 const port = process.env.PORT || 3000;
 
 //Manda un json a restAPI
@@ -50,6 +48,7 @@ app.post('/usuarios', (req, res) => {
     last_name: req.body.last_name,
     email: req.body.email,
     password: md5(req.body.password),
+    fechaDeNacimiento:req.body.fechaDeNacimiento,
     intentos: 0,
     bloqueado: false
   });
