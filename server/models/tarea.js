@@ -14,6 +14,9 @@ var Tarea = mongoose.model('Tarea', {
     //trim (Validador): Elimina los espacios en blanco al pŕincipio y final de descripcion (quita que el nombre sea solo espacios en blanco)
     trim: true
   },
+  username: {
+    type: String,
+  },
   completado: {
     type: Boolean,
     default: false
