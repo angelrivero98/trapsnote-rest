@@ -141,11 +141,15 @@ UserSchema.statics.findByCredentials= function (email,password){
       return Promise.reject();
     }
     return new Promise((resolve,reject)=>{
+      if(!usuario.bloqueado){
       if(md5(password)!=usuario.password){
         reject();
       }else{
         resolve(usuario);
       }
+    }else{
+      reject();
+    }
     });
   });
 };

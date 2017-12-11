@@ -54,9 +54,9 @@ app.post('/usuarios', (req, res) => {
   });
 
   usuario.save().then(() => {
-   return usuario.generateAuthToken();
- }).then((token)=>{
-  res.header('x-auth',token).send(usuario);
+   return usuario;
+ }).then((usuario)=>{
+  res.status(200).send(usuario);
  }).catch((e)=>{
    res.status(400).send(e);
  })
@@ -66,7 +66,7 @@ app.get('/usuarios/me',authenticate,(req,res)=>{
  res.send(req.usuario);
 });
 
-app.delete('/usuarios/me/token',authenticate,(req,res)=>{
+app.delete('/usuarios/logout',authenticate,(req,res)=>{
   req.usuario.removeToken(req.token).then(()=>{
     res.status(200).send();
   },()=>{
