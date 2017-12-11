@@ -30,7 +30,7 @@ var body= _.pick(req.body,['email','password']);
 //Guarda una nueva tarea en db mandada por servidor
 app.post('/tareas', (req, res) => {
   var tarea = new Tarea({
-    descripcion: req.body.descripcion
+    descripcion: req.body.descripcion,
   });
 
   tarea.save().then((doc) => {
@@ -163,6 +163,30 @@ app.get('/tareas/:id', (req, res) => {
 
   }).catch((e) => res.status(400).send());
 });
+
+
+//RELACIÓN DE USUARIOS Y TAREAS
+app.post('/:username/tareas', (req, res) => {
+  var username = req.params.username;
+  var tarea = new Tarea ({
+    descripcion: req.body.descripcion,
+    username: username
+  })
+  tarea.save().then((doc) => {
+    res.status(200).send(doc);
+  }, (err) => {
+    res.status(400).send(err);
+  })
+})
+
+app.get('/:username/tareas', (req, res) => {
+  var username = req.params.username;
+  Tarea.find({ username: username }).then((tareas) => {
+    res.send({tareas});
+  }, (err) => {
+    res.status(400).send(err);
+  });
+})
 
 app.listen(port, () => {
   console.log(`Servidor iniciado en port ${port}`);
