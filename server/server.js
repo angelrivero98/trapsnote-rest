@@ -177,7 +177,7 @@ app.post('/:username/tareas', (req, res) => {
   }, (err) => {
     res.status(400).send(err);
   })
-})
+});
 
 app.get('/:username/tareas', (req, res) => {
   var username = req.params.username;
@@ -186,7 +186,7 @@ app.get('/:username/tareas', (req, res) => {
   }, (err) => {
     res.status(400).send(err);
   });
-})
+});
 
 app.listen(port, () => {
   console.log(`Servidor iniciado en port ${port}`);
