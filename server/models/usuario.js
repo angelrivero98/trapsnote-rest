@@ -55,7 +55,7 @@ var UserSchema= new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 1,
+    minlength: 7,
     trim: true,
     maxlength:50,
     validate:{
@@ -112,7 +112,7 @@ return true;
 UserSchema.methods.toJSON=function(){
   var usuario=this;
   var userObject = usuario.toObject();
-  return _.pick(userObject,['_id','username','name','last_name','email']);
+  return _.pick(userObject,['_id','username','name','last_name','email','fechaDeNacimiento']);
 };
 UserSchema.methods.generateAuthToken= function(){
   var usuario=this;
