@@ -27,19 +27,6 @@ var body= _.pick(req.body,['email','password']);
 
 });
 
-//Guarda una nueva tarea en db mandada por servidor
-app.post('/tareas', (req, res) => {
-  var tarea = new Tarea({
-    descripcion: req.body.descripcion,
-  });
-
-  tarea.save().then((doc) => {
-    res.status(200).send(doc);
-  }, (err) => {
-    res.status(400).send(err);
-  })
-});
-
 //Guarda un nuevo usuario en db mandada por servidor
 app.post('/usuarios', (req, res) => {
   var usuario = new Usuario({
@@ -84,17 +71,7 @@ app.get('/usuarios',(req,res)=>{
   })
 });
 
-//Obtiene una nueva tarea del servidor
-app.get('/tareas', (req,res) => {
-  Tarea.find().then((tareas) => {
-    res.send({tareas});
-  }, (err) => {
-    res.status(400).send(err);
-  });
-});
-
-
-//Obtiene un usuario por el username ya que por id, la WebApp, no sabra el id
+//Obtiene un usuario por el username
 
 app.get('/usuarios/:username', (req, res) => {
   var username = req.params.username;
@@ -129,38 +106,6 @@ app.patch('/usuarios/:username',(req,res) =>{ // solo se puede modificar el nomb
       return res.status(404).send(); // Si el usuario no existe devuelve una respuesta 404
     }
     res.send({usuario}); // Si todo estuvo bien, devuelve el usuario
-  }).catch((e) => res.status(400).send());
-});
-
-
-//Obtiene una usuario según su id
-app.get('/usuarios/:id', (req, res) => {
-  var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
-  if (!ObjectID.isValid(id)) {
-    return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
-  }
-  Usuario.findById(id).then((usuario) => { //Se realiza la busqueda del usuario por ID
-    if (!usuario) {
-      return res.status(404).send(); // Si el usuario no existe devuelve una respuesta 404
-    }
-    res.send({usuario}); // Si todo estuvo bien, devuelve el usuario
-  }).catch((e) => res.status(400).send()); // Si hubo un error lo atrapa y devuelve una respuesta 400
-});
-
-
-//Obtiene una tarea según su id
-
-app.get('/tareas/:id', (req, res) => {
-  var id = req.params.id;
-  if (!ObjectID.isValid(id)) {
-    return res.status(404).send();
-  }
-  Tarea.findById(id).then((tarea) => {
-    if (!tarea) {
-      return res.status(400).send();
-    }
-    res.send({tarea});
-
   }).catch((e) => res.status(400).send());
 });
 
