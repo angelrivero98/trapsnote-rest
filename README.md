@@ -4,6 +4,9 @@ Repositorio del subgrupo de RestAPI de la aplicación Trapsnote
 Usuarios: https://dry-forest-40048.herokuapp.com/usuarios (GET para ver usuarios y POST para registrar a un usuario)
 
 
+Usuarios Username: https://dry-forest-40048.herokuapp.com/usuarios/:username (GET para ver el usuario, DELETE eliminar usuario y PATCH para modificar los campos del usuario
+
+
 Login: https://dry-forest-40048.herokuapp.com/login (POST)
 
 
