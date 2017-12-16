@@ -67,7 +67,8 @@ app.get('/usuarios/me',authenticate,(req,res)=>{
 });
 
 app.delete('/usuarios/logout',authenticate,(req,res)=>{
-  req.usuario.removeToken(req.token).then(()=>{
+  var token= req.header('x-auth');
+  req.usuario.removeToken(token).then(()=>{
     res.status(200).send();
   },()=>{
     res.status(400).send();
