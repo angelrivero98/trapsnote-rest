@@ -22,7 +22,7 @@ var Tarea = mongoose.model('Tarea', {
     default: false
   },
   horaCompletado: {
-    type: Number,
+    type: Date,
     default: null
   }
 });

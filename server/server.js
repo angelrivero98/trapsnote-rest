@@ -134,6 +134,39 @@ app.get('/:username/tareas', (req, res) => {
   });
 });
 
+app.delete('/:username/tareas/:id', (req,res) => {
+    var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
+    if (!ObjectID.isValid(id)) {
+    return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
+    }
+    Tarea.findByIdAndRemove(id).then((tarea) => { //Se realiza la busqueda del usuario por ID
+    if (!tarea) {
+      return res.status(404).send(); // Si el usuario no existe devuelve una respuesta 404
+    }
+    res.send({tarea}); // Si todo estuvo bien, devuelve el usuario
+  }).catch((e) => res.status(400).send());
+});
+
+app.patch('/:username/tareas/:id',(req,res) =>{
+  var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
+  var body = _.pick(req.body,['descripcion','completado']); // agarramos los parametros que se pueden modificar
+  if (!ObjectID.isValid(id)) {
+  return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
+  }
+  if (_.isBoolean(body.completado) && body.completado){ //Comprobamos si el usuario coloco como verdadero el campo de completado
+    body.horaCompletado = new Date (); //Asignamos la hora actual en que fue completado
+  }else {
+    body.completado = false; //Si no lo asignamos a falso por si acaso
+    body.horaCompletado = null; // Y nulo la hora
+  }
+  Tarea.findByIdAndUpdate(id, {$set: body},{new: true}).then((tarea) => { //Se realiza la busqueda de la tarea por ID
+  if (!tarea) {
+    return res.status(404).send(); // Si tarea no existe devuelve una respuesta 404
+  }
+  res.send({tarea}); // Si todo estuvo bien, devuelve la tarea
+  }).catch((e) => res.status(400).send());
+});
+
 app.listen(port, () => {
   console.log(`Servidor iniciado en port ${port}`);
 });
