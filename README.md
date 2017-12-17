@@ -16,7 +16,7 @@ Logout: https://dry-forest-40048.herokuapp.com/usuarios/logout (DELETE)
 Tareas: https://dry-forest-40048.herokuapp.com/:username/tareas (GET para ver todas las tareas del usuario y POST para crear tareas)
 
 
-Tareas ID: https://dry-forest-40048.herokuapp.com/:username/tareas/:id (DELETE para eliminar una tarea y PATCH para modificar una tarea)
+Tareas ID: https://dry-forest-40048.herokuapp.com/:username/tareas/:id (GET para ver una tarea, DELETE para eliminar una tarea ,PATCH para modificar una tarea, PUT para marcar una tarea como completada)
 
 
 :username "Va el username del usuario que desea ver las tareas"
