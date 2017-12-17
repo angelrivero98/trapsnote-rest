@@ -112,11 +112,14 @@ app.patch('/usuarios/:username',(req,res) =>{ // solo se puede modificar el nomb
 
 
 //RELACIÓN DE USUARIOS Y TAREAS
-app.post('/:username/tareas', (req, res) => {
+app.post('/:username/tareas', (req, res) => { //Registrar tareas
   var username = req.params.username;
   var tarea = new Tarea ({
     descripcion: req.body.descripcion,
-    username: username
+    categoria : req.body.categoria,
+    username: username,
+    fechaRegistro: new Date (),
+    horaCompletado : req.body.horaCompletado
   })
   tarea.save().then((doc) => {
     res.status(200).send(doc);
@@ -125,7 +128,7 @@ app.post('/:username/tareas', (req, res) => {
   })
 });
 
-app.get('/:username/tareas', (req, res) => {
+app.get('/:username/tareas', (req, res) => { //Listar tareas sin ordenar
   var username = req.params.username;
   Tarea.find({ username: username }).then((tareas) => {
     res.send({tareas});
@@ -134,7 +137,7 @@ app.get('/:username/tareas', (req, res) => {
   });
 });
 
-app.delete('/:username/tareas/:id', (req,res) => {
+app.delete('/:username/tareas/:id', (req,res) => { //Eliminar tarea
     var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
     if (!ObjectID.isValid(id)) {
     return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
@@ -147,23 +150,56 @@ app.delete('/:username/tareas/:id', (req,res) => {
   }).catch((e) => res.status(400).send());
 });
 
-app.patch('/:username/tareas/:id',(req,res) =>{
+app.patch('/:username/tareas/:id',(req,res) =>{ // Actualizar tarea por hacer
   var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
-  var body = _.pick(req.body,['descripcion','completado']); // agarramos los parametros que se pueden modificar
+  var body = _.pick(req.body,['descripcion','categoria','horaCompletado']); // agarramos los parametros que se pueden modificar
   if (!ObjectID.isValid(id)) {
   return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
   }
-  if (_.isBoolean(body.completado) && body.completado){ //Comprobamos si el usuario coloco como verdadero el campo de completado
-    body.horaCompletado = new Date (); //Asignamos la hora actual en que fue completado
-  }else {
-    body.completado = false; //Si no lo asignamos a falso por si acaso
-    body.horaCompletado = null; // Y nulo la hora
+  Tarea.findById(id).then((tarea) =>{
+    if (!tarea) {
+      return res.status(404).send(); // Si la tarea no existe devuelve una respuesta 404
+    }
+    if (!tarea.completado){
+      Tarea.findByIdAndUpdate(id, {$set: body},{new: true}).then((tarea) => { //Se realiza la busqueda de la tarea por ID
+        res.send({tarea}); // Si todo estuvo bien, devuelve la tarea
+      }).catch((e) => res.status(400).send());
+    } else {
+      return res.status(406).send(); // Si la tarea esta completada no puedes modificarla, lanzando una respuesta no aceptable
+    }
+  });
+});
+
+app.put('/:username/tareas/:id',(req,res) =>{ //Marcar tarea como completada
+  var id = req.params.id;
+  var body = _.pick(req.body,['completado']);
+  if (!ObjectID.isValid(id)) {
+  return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
   }
-  Tarea.findByIdAndUpdate(id, {$set: body},{new: true}).then((tarea) => { //Se realiza la busqueda de la tarea por ID
-  if (!tarea) {
-    return res.status(404).send(); // Si tarea no existe devuelve una respuesta 404
+  Tarea.findById(id).then((tarea) =>{
+    if (!tarea) {
+      return res.status(404).send(); // Si la tarea no existe devuelve una respuesta 404
+    }
+    if (!tarea.completado){ // Si la tarea no esta completada entonces puedes marcarla como completada
+      Tarea.findByIdAndUpdate(id, {$set: body},{new: true}).then((tarea) => { //Se realiza la busqueda de la tarea por ID
+        res.send({tarea}); // Si todo estuvo bien, devuelve la tarea
+      }).catch((e) => res.status(400).send());
+    } else {
+      return res.status(406).send(); // Si ya fue completada no te permite actualizarla, lanzando una respuesta no aceptable
+    }
+  });
+});
+
+app.get('/:username/tareas/:id',(req,res) =>{ //Consultar tarea por hacer
+  var id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+  return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
   }
-  res.send({tarea}); // Si todo estuvo bien, devuelve la tarea
+  Tarea.findById(id).then((tarea) => {
+    if (!tarea) {
+      return res.status(404).send(); // Si la tarea no existe devuelve una respuesta 404
+    }
+    res.send({tarea}); // Si todo estuvo bien, devuelve la tarea
   }).catch((e) => res.status(400).send());
 });
 
