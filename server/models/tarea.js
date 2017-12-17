@@ -14,6 +14,12 @@ var Tarea = mongoose.model('Tarea', {
     //trim (Validador): Elimina los espacios en blanco al pŕincipio y final de descripcion (quita que el nombre sea solo espacios en blanco)
     trim: true
   },
+  categoria: {
+    type:String,
+    trim: true,
+    required: true,
+    minlength: 1
+  },
   username: {
     type: String,
   },
@@ -24,6 +30,9 @@ var Tarea = mongoose.model('Tarea', {
   horaCompletado: {
     type: Date,
     default: null
+  },
+  fechaRegistro: {
+    type: Date
   }
 });
 
