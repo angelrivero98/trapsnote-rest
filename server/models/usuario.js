@@ -1,6 +1,4 @@
 var mongoose = require("mongoose");
-const moment = require('moment');
-moment().format();
 const validator = require("validator");
 
 const jwt = require('jsonwebtoken');
@@ -97,13 +95,13 @@ var UserSchema= new mongoose.Schema({
 
 function serMayorDeEdad (value) {
   var hoy = new Date(); // Una variable para guardar la fecha actual
-  var yearEdad = moment(value).fromNow().match(/\d+/g); //Una variable para guardar los años que tiene
-  if ((yearEdad==18)&&(value.getMonth()== hoy.getMonth())){ // Se comprueba que aparte esta en el año "18" y esta en el mismo mes que la fecha actual
+  //var yearEdad = moment(value).fromNow().match(/\d+/g); //Una variable para guardar los años que tiene
+  if (((hoy.getFullYear()-value.getFullYear()) == 18 )&&(value.getMonth()== hoy.getMonth())){ // Se comprueba que aparte esta en el año "18" y esta en el mismo mes que la fecha actual
     if(value.getDate()>hoy.getDate()) return false; //Si esta un dia mas aparte de la fecha actual devuelve falso para que no pueda registrarse
   } else {
-    if((yearEdad==18)&&(value.getMonth()>hoy.getMonth())) {return false;}  //Si esta en el año que es y ademas el mes de nacimiento esta despues del mes actual retorna falso
+    if(((hoy.getFullYear()-value.getFullYear()) == 18 )&&(value.getMonth()>hoy.getMonth())) {return false;}  //Si esta en el año que es y ademas el mes de nacimiento esta despues del mes actual retorna falso
       else {
-        if (yearEdad<18) return false; // Y por ultimo si es menor de 18 tampoco lo deja registrarse
+        if (((hoy.getFullYear()-value.getFullYear())< 18 )) return false; // Y por ultimo si es menor de 18 tampoco lo deja registrarse
       }
   }
 return true;
@@ -112,7 +110,7 @@ return true;
 UserSchema.methods.toJSON=function(){
   var usuario=this;
   var userObject = usuario.toObject();
-  return _.pick(userObject,['_id','username','name','last_name','email','fechaDeNacimiento']);
+  return _.pick(userObject,['_id','username','name','last_name','email','fechaDeNacimiento','intentos','bloqueado']);
 };
 UserSchema.methods.generateAuthToken= function(){
   var usuario=this;
