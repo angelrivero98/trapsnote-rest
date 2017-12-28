@@ -1,5 +1,5 @@
 var mongoose = require("mongoose");
-
+const validator = require("validator");
 //Constructor de tareas
 var Tarea = mongoose.model('Tarea', {
   nombre: {
@@ -34,11 +34,18 @@ var Tarea = mongoose.model('Tarea', {
   },
   fechaLimite: {
     type: Date,
-    default: null
+    default: null,
+    validate:{
+      validator: fechaInvalida,  //Llamo a la funcion que me permite verificar si es mayor de edad
+      message: 'La fecha limite tiene que ser despues de la fecha actual' //Si no es mayor de edad te devuelve un error con el msj
+    }
   },
   fechaRegistro: {
     type: Date
   }
 });
 
+function fechaInvalida (value) {
+  if (value < new Date ()) return false;
+}
 module.exports = {Tarea};
