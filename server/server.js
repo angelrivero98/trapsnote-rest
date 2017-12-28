@@ -29,7 +29,7 @@ var body= _.pick(req.body,['email','password']);
 
 //Guarda un nuevo usuario en db mandada por servidor
 app.post('/usuarios', (req, res) => {
-  var campos = ['username','name','last_name','email','password','fechaDeNacimiento'];
+  var campos = ['username','name','last_name','email','password','fechaDeNacimiento','formaRegistro'];
   var body = _.pick(req.body,campos);
   var usuario = new Usuario(body);
 
@@ -108,11 +108,12 @@ app.patch('/usuarios/:username',(req,res) =>{ // solo se puede modificar el nomb
 app.post('/:username/tareas', (req, res) => { //Registrar tareas
   var username = req.params.username;
   var tarea = new Tarea ({
+    nombre: req.body.nombre,
     descripcion: req.body.descripcion,
     categoria : req.body.categoria,
     username: username,
     fechaRegistro: new Date (),
-    horaCompletado : req.body.horaCompletado
+    fechaLimite : req.body.fechaLimite
   })
   tarea.save().then((doc) => {
     res.status(200).send(doc);
