@@ -22,7 +22,7 @@ var body= _.pick(req.body,['email','password']);
    res.header('x-auth',token).send(usuario);
  });
  }).catch((e)=>{
-  res.status(400).send();
+  res.status(400).send(e);
  });
 
 });
@@ -34,7 +34,7 @@ app.post('/usuarios', (req, res) => {
     name: req.body.name,
     last_name: req.body.last_name,
     email: req.body.email,
-    password: md5(req.body.password),
+    password: req.body.password,
     fechaDeNacimiento:req.body.fechaDeNacimiento,
     intentos: 0,
     bloqueado: false
@@ -43,10 +43,12 @@ app.post('/usuarios', (req, res) => {
   usuario.save().then(() => {
    return usuario;
  }).then((usuario)=>{
-  res.status(200).send(usuario);
+   usuario.password=md5(usuario.password);
+   usuario.save();
+   res.status(200).send(usuario);
  }).catch((e)=>{
    res.status(400).send(e);
- })
+ });
 });
 
 app.get('/usuarios/me',authenticate,(req,res)=>{
