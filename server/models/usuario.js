@@ -143,6 +143,9 @@ UserSchema.statics.findByCredentials= function (email,password){
       if(!usuario.bloqueado){
       if(md5(password)!=usuario.password){
         errormsg=JSON.parse('{"errormsg":"Contraseña incorrecta"}');
+        usuario.intentos++;
+        if (usuario.intentos==5)usuario.bloqueado=true;
+        usuario.save();
         reject(errormsg);
       }else{
         resolve(usuario);
