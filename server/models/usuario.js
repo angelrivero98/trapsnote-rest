@@ -133,19 +133,23 @@ return  usuario.update({
 
 UserSchema.statics.findByCredentials= function (email,password){
   var Usuario =this;
+  var errormsg;
   return Usuario.findOne({email}).then((usuario)=>{
     if(!usuario){
-      return Promise.reject();
+      errormsg=JSON.parse('{"errormsg":"El usuario no existe"}');
+      return Promise.reject(errormsg);
     }
     return new Promise((resolve,reject)=>{
       if(!usuario.bloqueado){
       if(md5(password)!=usuario.password){
-        reject();
+        errormsg=JSON.parse('{"errormsg":"Contraseña incorrecta"}');
+        reject(errormsg);
       }else{
         resolve(usuario);
       }
     }else{
-      reject();
+      errormsg=JSON.parse('{"errormsg":"Su usuario se encuentra bloqueado"}');
+      reject(errormsg);
     }
     });
   });
