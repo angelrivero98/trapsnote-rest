@@ -22,13 +22,14 @@ var body= _.pick(req.body,['email','password']);
    res.header('x-auth',token).send(usuario);
  });
  }).catch((e)=>{
-  res.status(400).send();
+  res.status(400).send(e);
  });
 
 });
 
 //Guarda un nuevo usuario en db mandada por servidor
 app.post('/usuarios', (req, res) => {
+
   var campos = ['username','name','last_name','email','password','fechaDeNacimiento'];
   var body = _.pick(req.body,campos);
   var usuario = new Usuario(body);
@@ -38,10 +39,10 @@ app.post('/usuarios', (req, res) => {
  }).then((usuario)=>{
    usuario.password=md5(usuario.password);
    usuario.save();
-  res.status(200).send(usuario);
-}).catch((err)=>{
-   res.status(400).send(err);
- })
+   res.status(200).send(usuario);
+ }).catch((e)=>{
+   res.status(400).send(e);
+ });
 });
 
 app.get('/usuarios/me',authenticate,(req,res)=>{
