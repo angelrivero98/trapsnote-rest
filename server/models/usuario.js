@@ -75,11 +75,13 @@ var UserSchema= new mongoose.Schema({
   },
 
   intentos: {
-    type: Number
+    type: Number,
+    default: 0
   },
 
   bloqueado: {
-    type: Boolean
+    type: Boolean,
+    default: false
   },
   tokens:[{
     access:{

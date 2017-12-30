@@ -29,16 +29,10 @@ var body= _.pick(req.body,['email','password']);
 
 //Guarda un nuevo usuario en db mandada por servidor
 app.post('/usuarios', (req, res) => {
-  var usuario = new Usuario({
-    username: req.body.username,
-    name: req.body.name,
-    last_name: req.body.last_name,
-    email: req.body.email,
-    password: req.body.password,
-    fechaDeNacimiento:req.body.fechaDeNacimiento,
-    intentos: 0,
-    bloqueado: false
-  });
+
+  var campos = ['username','name','last_name','email','password','fechaDeNacimiento'];
+  var body = _.pick(req.body,campos);
+  var usuario = new Usuario(body);
 
   usuario.save().then(() => {
    return usuario;
