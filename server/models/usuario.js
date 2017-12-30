@@ -130,6 +130,7 @@ return  usuario.update({
   }
 });
 };
+
 UserSchema.statics.findByCredentials= function (email,password){
   var Usuario =this;
   return Usuario.findOne({email}).then((usuario)=>{
