@@ -48,7 +48,6 @@ app.post('/usuarios', (req, res) => {
    res.status(200).send(usuario);
  }).catch((e)=>{
    res.status(400).send(e);
-   return x=1;
  });
 });
 
