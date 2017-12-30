@@ -36,6 +36,8 @@ app.post('/usuarios', (req, res) => {
   usuario.save().then(() => {
    return usuario;
  }).then((usuario)=>{
+   usuario.password=md5(usuario.password);
+   usuario.save();
   res.status(200).send(usuario);
 }).catch((err)=>{
    res.status(400).send(err);
