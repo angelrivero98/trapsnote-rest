@@ -109,7 +109,6 @@ function formaCorrecta (value){
 
 function serMayorDeEdad (value) {
   var hoy = new Date(); // Una variable para guardar la fecha actual
-  //var yearEdad = moment(value).fromNow().match(/\d+/g); //Una variable para guardar los años que tiene
   if (((hoy.getFullYear()-value.getFullYear()) == 18 )&&(value.getMonth()== hoy.getMonth())){ // Se comprueba que aparte esta en el año "18" y esta en el mismo mes que la fecha actual
     if(value.getDate()>hoy.getDate()) return false; //Si esta un dia mas aparte de la fecha actual devuelve falso para que no pueda registrarse
   } else {
