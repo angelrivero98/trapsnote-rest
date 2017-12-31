@@ -7,17 +7,26 @@ var Tarea = mongoose.model('Tarea', {
     required: true,
     minlength:1,
     maxlength:255,
-    trim: true
+    trim: true,
+    validate:{
+    validator: (value)=>{
+          return validator.isAlphanumeric(value);
+    },
+    message: '{VALUE} El nombre debe ser alfanumerica'
+    }
   },
   descripcion: {
     type: String,
-    //required (Validador): No crea la tarea a menos que tenga el campo de descripcion
     required: true,
-    //minlength (Validador): Mínimo de caracteres o valores para poder crear el objeto
     minlength: 1,
     maxlength:255,
-    //trim (Validador): Elimina los espacios en blanco al pŕincipio y final de descripcion (quita que el nombre sea solo espacios en blanco)
-    trim: true
+    trim: true,
+    validate:{
+    validator: (value)=>{
+          return validator.isAlphanumeric(value);
+    },
+    message: '{VALUE} La descripcion debe ser alfanumerica'
+    }
   },
   categoria: {
     type:String,
@@ -37,7 +46,7 @@ var Tarea = mongoose.model('Tarea', {
     default: null,
     validate:{
       validator: fechaInvalida,  //Llamo a la funcion que me permite verificar si es mayor de edad
-      message: 'La fecha limite tiene que ser despues de la fecha actual' //Si no es mayor de edad te devuelve un error con el msj
+      message: '{VALUE} La fecha limite tiene que ser despues de la fecha actual' //Si no es mayor de edad te devuelve un error con el msj
     }
   },
   fechaRegistro: {
