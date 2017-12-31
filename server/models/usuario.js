@@ -79,6 +79,20 @@ var UserSchema= new mongoose.Schema({
     default: 0
   },
 
+  fechaRegistro: {
+    type: Date,
+    default: new Date ()
+  },
+
+  formaRegistro:{
+    type: String,
+    required : true,
+    validate:{
+      validator: formaCorrecta,
+      message: 'Ingrese una forma de registro correcta'
+    }
+  },
+
   bloqueado: {
     type: Boolean,
     default: false
@@ -94,6 +108,12 @@ var UserSchema= new mongoose.Schema({
     }
   }]
 });
+
+function formaCorrecta (value){
+  if ((value === "web") || (value === "rest") || (value === "movil")) {return true; }
+  else
+  {return false;}
+}
 
 function serMayorDeEdad (value) {
   var hoy = new Date(); // Una variable para guardar la fecha actual
@@ -112,7 +132,7 @@ return true;
 UserSchema.methods.toJSON=function(){
   var usuario=this;
   var userObject = usuario.toObject();
-  return _.pick(userObject,['_id','username','name','last_name','email','fechaDeNacimiento','intentos','bloqueado']);
+  return _.pick(userObject,['_id','username','name','last_name','email','fechaDeNacimiento','intentos','bloqueado','fechaRegistro','formaRegistro']);
 };
 UserSchema.methods.generateAuthToken= function(){
   var usuario=this;
