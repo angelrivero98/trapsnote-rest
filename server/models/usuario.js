@@ -7,7 +7,6 @@ var md5 = require('md5');
 var UserSchema= new mongoose.Schema({
 
   username:{  //Campo del nombre de usuario, donde se valida que sea unico
-
     type: String,
     required: true,
     minlength: 1,
@@ -17,16 +16,9 @@ var UserSchema= new mongoose.Schema({
   },
   name: {
     type: String,
-
-    //required (Validador): No crea la tarea a menos que tenga el campo de descripcion
     required: true,
-
-    //minlength (Validador): Mínimo de caracteres o valores para poder crear el objeto
     minlength: 1,
-
-    //trim (Validador): Elimina los espacios en blanco al pŕincipio y final de descripcion (quita que el nombre sea solo espacios en blanco)
     trim: true,
-
     maxlength:50
   },
   last_name: {

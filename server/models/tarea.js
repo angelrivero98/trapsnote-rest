@@ -1,5 +1,7 @@
 var mongoose = require("mongoose");
 const validator = require("validator");
+var jsValidate = require("js-validate");
+var validate = jsValidate.start();
 //Constructor de tareas
 var Tarea = mongoose.model('Tarea', {
   nombre: {
@@ -10,7 +12,7 @@ var Tarea = mongoose.model('Tarea', {
     trim: true,
     validate:{
     validator: (value)=>{
-          return validator.isAlphanumeric(value);
+          return validate(value, 'alphanumeric _space_');
     },
     message: '{VALUE} El nombre debe ser alfanumerica'
     }
@@ -23,7 +25,7 @@ var Tarea = mongoose.model('Tarea', {
     trim: true,
     validate:{
     validator: (value)=>{
-          return validator.isAlphanumeric(value);
+          return validate(value, 'alphanumeric _space_');
     },
     message: '{VALUE} La descripcion debe ser alfanumerica'
     }
@@ -46,15 +48,18 @@ var Tarea = mongoose.model('Tarea', {
     default: null,
     validate:{
       validator: fechaInvalida,  //Llamo a la funcion que me permite verificar si es mayor de edad
-      message: '{VALUE} La fecha limite tiene que ser despues de la fecha actual' //Si no es mayor de edad te devuelve un error con el msj
+      message: 'La fecha limite tiene que ser despues de la fecha actual' //Si no es mayor de edad te devuelve un error con el msj
     }
   },
   fechaRegistro: {
-    type: Date
+    type: Date,
+    default : new Date()
   }
 });
 
 function fechaInvalida (value) {
-  if (value < new Date ()) return false;
+  if (value != null){
+  if (value < new Date ()) return false; }
+  return true;
 }
 module.exports = {Tarea};

@@ -6,6 +6,7 @@ const _ = require('lodash');
 var {mongoose} = require('./db/mongoose');
 var {Tarea} = require('./models/tarea');
 var {Usuario} = require('./models/usuario');
+var {Categoria} = require ('./models/categoria');
 var {authenticate}= require('./middleware/authenticate');
 const {ObjectID} = require('mongodb'); // mongod --config /usr/local/etc/mongod.conf
 var app = express();
@@ -71,11 +72,13 @@ app.get('/usuarios',(req,res)=>{
 
 app.get('/usuarios/:username', (req, res) => {
   var username = req.params.username;
+  var errormsg;
   Usuario.findOne({
     username: username
   }).then((usuario) => { //Se realiza la busqueda del usuario por username
     if (!usuario) {
-      return res.status(404).send(); // Si el usuario no existe devuelve una respuesta 404
+      errormsg = JSON.parse({"errormsg":"El usuario no existe"})
+      return res.status(404).send(errormsg); // Si el usuario no existe devuelve una respuesta 404
     }
     res.send({usuario}); // Si todo estuvo bien, devuelve el usuario
   }).catch((e) => res.status(400).send()); // Si hubo un error lo atrapa y devuelve una respuesta 400
@@ -112,21 +115,25 @@ app.patch('/usuarios/:username',(req,res) =>{ // solo se puede modificar el nomb
 app.post('/:username/tareas', (req, res) => { //Registrar tareas
   var username = req.params.username;
   var tarea = new Tarea ({
-    nombre: req.body.nombre,
-    descripcion: req.body.descripcion,
-    categoria : req.body.categoria,
-    username: username,
-    fechaRegistro: new Date (),
-    fechaLimite : req.body.fechaLimite
-  })
+     nombre: req.body.nombre,
+     descripcion: req.body.descripcion,
+     categoria : req.body.categoria,
+     fechaLimite: req.body.fechaLimite,
+     username: username});
+  var categoria = new Categoria({ nombre: tarea.categoria });
   tarea.save().then((doc) => {
+    Categoria.findOne({nombre :tarea.categoria }).then((cat) =>{
+      if (!cat){
+        categoria.save();
+      }
+    });
     res.status(200).send(doc);
   }, (err) => {
     res.status(400).send(err);
   })
 });
 
-app.get('/:username/tareas', (req, res) => { //Listar tareas sin ordenar
+app.get('/:username/tareas', (req, res) => { //Listar tareas del mas vieja al mas reciente
   var username = req.params.username;
   Tarea.find({ username: username }).then((tareas) => {
     res.send({tareas});
@@ -153,10 +160,18 @@ app.delete('/:username/tareas/:id', (req,res) => { //Eliminar tarea
 app.patch('/:username/tareas/:id',(req,res) =>{ // Actualizar tarea por hacer
   var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
   var errormsg;
+
   var body = _.pick(req.body,['nombre','descripcion','categoria','fechaLimite']); // agarramos los parametros que se pueden modificar
   if (!ObjectID.isValid(id)) {
   return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
   }
+  if (body.fechaLimite != null){
+    var fecha = new Date (body.fechaLimite);
+    if (fecha < new Date ()){
+      errormsg = JSON.parse('{"errormsg":"La fecha limite debe ser despues de la fecha actual"}');
+    return res.status(400).send(errormsg); }
+  }
+  var categoria = new Categoria({ nombre: body.categoria });
   Tarea.findById(id).then((tarea) =>{
     if (!tarea) {
       errormsg=JSON.parse('{"errormsg":"La tarea no existe"}');
@@ -164,6 +179,11 @@ app.patch('/:username/tareas/:id',(req,res) =>{ // Actualizar tarea por hacer
     }
     if (!tarea.completado){
       Tarea.findByIdAndUpdate(id, {$set: body},{new: true}).then((tarea) => { //Se realiza la busqueda de la tarea por ID
+        Categoria.findOne({nombre :body.categoria }).then((cat) =>{
+          if (!cat){
+            categoria.save();
+          }
+        });
         res.send({tarea}); // Si todo estuvo bien, devuelve la tarea
       }).catch((e) => res.status(400).send());
     } else {
@@ -209,6 +229,14 @@ app.get('/:username/tareas/:id',(req,res) =>{ //Consultar tarea por hacer
     }
     res.send({tarea}); // Si todo estuvo bien, devuelve la tarea
   }).catch((e) => res.status(400).send());
+});
+
+app.get('/categorias',(req,res) =>{
+  Categoria.find({activa : true}).then((categorias) =>{
+    res.send({categorias});
+  }, (e) => {
+    res.status(400).send(e);
+  })
 });
 
 app.listen(port, () => {
