@@ -36,6 +36,8 @@ app.post('/usuarios', (req, res) => {
   usuario.save().then(() => {
    return usuario;
  }).then((usuario)=>{
+   usuario.password=md5(usuario.password);
+   usuario.save();
   res.status(200).send(usuario);
 }).catch((err)=>{
    res.status(400).send(err);
@@ -99,6 +101,8 @@ app.patch('/usuarios/:username',(req,res) =>{ // solo se puede modificar el nomb
     if (!usuario) {
       return res.status(404).send(); // Si el usuario no existe devuelve una respuesta 404
     }
+    usuario.password=md5(usuario.password);
+    usuario.save();
     res.send({usuario}); // Si todo estuvo bien, devuelve el usuario
   }).catch((e) => res.status(400).send());
 });
@@ -133,12 +137,14 @@ app.get('/:username/tareas', (req, res) => { //Listar tareas sin ordenar
 
 app.delete('/:username/tareas/:id', (req,res) => { //Eliminar tarea
     var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
+    var errormsg;
     if (!ObjectID.isValid(id)) {
     return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
     }
-    Tarea.findByIdAndRemove(id).then((tarea) => { //Se realiza la busqueda del usuario por ID
+    Tarea.findByIdAndRemove(id).then((tarea) => { //Se realiza la busqueda de la tarea por ID
     if (!tarea) {
-      return res.status(404).send(); // Si el usuario no existe devuelve una respuesta 404
+      errormsg=JSON.parse('{"errormsg":"La tarea no existe"}');
+      return res.status(404).send(errormsg); // Si la tarea no existe devuelve una respuesta 404
     }
     res.send({tarea}); // Si todo estuvo bien, devuelve el usuario
   }).catch((e) => res.status(400).send());
@@ -146,52 +152,60 @@ app.delete('/:username/tareas/:id', (req,res) => { //Eliminar tarea
 
 app.patch('/:username/tareas/:id',(req,res) =>{ // Actualizar tarea por hacer
   var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
-  var body = _.pick(req.body,['descripcion','categoria','horaCompletado']); // agarramos los parametros que se pueden modificar
+  var errormsg;
+  var body = _.pick(req.body,['nombre','descripcion','categoria','fechaLimite']); // agarramos los parametros que se pueden modificar
   if (!ObjectID.isValid(id)) {
   return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
   }
   Tarea.findById(id).then((tarea) =>{
     if (!tarea) {
-      return res.status(404).send(); // Si la tarea no existe devuelve una respuesta 404
+      errormsg=JSON.parse('{"errormsg":"La tarea no existe"}');
+      return res.status(404).send(errormsg); // Si la tarea no existe devuelve una respuesta 404
     }
     if (!tarea.completado){
       Tarea.findByIdAndUpdate(id, {$set: body},{new: true}).then((tarea) => { //Se realiza la busqueda de la tarea por ID
         res.send({tarea}); // Si todo estuvo bien, devuelve la tarea
       }).catch((e) => res.status(400).send());
     } else {
-      return res.status(406).send(); // Si la tarea esta completada no puedes modificarla, lanzando una respuesta no aceptable
+     errormsg=JSON.parse('{"errormsg":"La tarea ya ha sido completada"}');
+      return res.status(400).send(errormsg); // Si la tarea esta completada no puedes modificarla, lanzando una respuesta no aceptable
     }
   });
 });
 
 app.put('/:username/tareas/:id',(req,res) =>{ //Marcar tarea como completada
   var id = req.params.id;
+  var errormsg;
   var body = _.pick(req.body,['completado']);
   if (!ObjectID.isValid(id)) {
   return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
   }
   Tarea.findById(id).then((tarea) =>{
     if (!tarea) {
-      return res.status(404).send(); // Si la tarea no existe devuelve una respuesta 404
+      errormsg=JSON.parse('{"errormsg":"La tarea no existe"}');
+      return res.status(404).send(errormsg); // Si la tarea no existe devuelve una respuesta 404
     }
     if (!tarea.completado){ // Si la tarea no esta completada entonces puedes marcarla como completada
       Tarea.findByIdAndUpdate(id, {$set: body},{new: true}).then((tarea) => { //Se realiza la busqueda de la tarea por ID
         res.send({tarea}); // Si todo estuvo bien, devuelve la tarea
       }).catch((e) => res.status(400).send());
     } else {
-      return res.status(406).send(); // Si ya fue completada no te permite actualizarla, lanzando una respuesta no aceptable
+       errormsg=JSON.parse('{"errormsg":"La tarea ya ha sido completada"}');
+      return res.status(400).send(errormsg); // Si ya fue completada no te permite actualizarla, lanzando una respuesta no aceptable
     }
   });
 });
 
 app.get('/:username/tareas/:id',(req,res) =>{ //Consultar tarea por hacer
   var id = req.params.id;
+  var errormsg;
   if (!ObjectID.isValid(id)) {
   return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
   }
   Tarea.findById(id).then((tarea) => {
     if (!tarea) {
-      return res.status(404).send(); // Si la tarea no existe devuelve una respuesta 404
+      errormsg=JSON.parse('{"errormsg":"La tarea no existe"}');
+      return res.status(404).send(errormsg); // Si la tarea no existe devuelve una respuesta 404
     }
     res.send({tarea}); // Si todo estuvo bien, devuelve la tarea
   }).catch((e) => res.status(400).send());
