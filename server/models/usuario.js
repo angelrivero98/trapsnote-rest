@@ -7,7 +7,6 @@ var md5 = require('md5');
 var UserSchema= new mongoose.Schema({
 
   username:{  //Campo del nombre de usuario, donde se valida que sea unico
-
     type: String,
     required: true,
     minlength: 1,
@@ -17,16 +16,9 @@ var UserSchema= new mongoose.Schema({
   },
   name: {
     type: String,
-
-    //required (Validador): No crea la tarea a menos que tenga el campo de descripcion
     required: true,
-
-    //minlength (Validador): Mínimo de caracteres o valores para poder crear el objeto
     minlength: 1,
-
-    //trim (Validador): Elimina los espacios en blanco al pŕincipio y final de descripcion (quita que el nombre sea solo espacios en blanco)
     trim: true,
-
     maxlength:50
   },
   last_name: {
@@ -117,7 +109,6 @@ function formaCorrecta (value){
 
 function serMayorDeEdad (value) {
   var hoy = new Date(); // Una variable para guardar la fecha actual
-  //var yearEdad = moment(value).fromNow().match(/\d+/g); //Una variable para guardar los años que tiene
   if (((hoy.getFullYear()-value.getFullYear()) == 18 )&&(value.getMonth()== hoy.getMonth())){ // Se comprueba que aparte esta en el año "18" y esta en el mismo mes que la fecha actual
     if(value.getDate()>hoy.getDate()) return false; //Si esta un dia mas aparte de la fecha actual devuelve falso para que no pueda registrarse
   } else {
