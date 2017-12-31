@@ -1,5 +1,5 @@
 var mongoose = require("mongoose");
-const validator = require("validator");
+var validator = require("validator");
 
 const jwt = require('jsonwebtoken');
 const _ =require('lodash');
@@ -152,24 +152,59 @@ return  usuario.update({
   }
 });
 };
+
 UserSchema.statics.findByCredentials= function (email,password){
   var Usuario =this;
+  var errormsg;
+  if(validator.isEmail(email)){
   return Usuario.findOne({email}).then((usuario)=>{
     if(!usuario){
-      return Promise.reject();
+      errormsg=JSON.parse('{"errormsg":"El usuario no existe"}');
+      return Promise.reject(errormsg);
     }
     return new Promise((resolve,reject)=>{
       if(!usuario.bloqueado){
       if(md5(password)!=usuario.password){
-        reject();
+        errormsg=JSON.parse('{"errormsg":"Contraseña incorrecta"}');
+        usuario.intentos++;
+        if (usuario.intentos==5)usuario.bloqueado=true;
+        usuario.save();
+        reject(errormsg);
       }else{
         resolve(usuario);
       }
     }else{
-      reject();
+      errormsg=JSON.parse('{"errormsg":"Su usuario se encuentra bloqueado"}');
+      reject(errormsg);
     }
     });
   });
+}else{
+  var username=email;
+  return Usuario.findOne({username}).then((usuario)=>{
+    if(!usuario){
+      errormsg=JSON.parse('{"errormsg":"El usuario no existe"}');
+      return Promise.reject(errormsg);
+    }
+    return new Promise((resolve,reject)=>{
+      if(!usuario.bloqueado){
+      if(md5(password)!=usuario.password){
+        errormsg=JSON.parse('{"errormsg":"Contraseña incorrecta"}');
+        usuario.intentos++;
+        if (usuario.intentos==5)usuario.bloqueado=true;
+        usuario.save();
+        reject(errormsg);
+      }else{
+        resolve(usuario);
+      }
+    }else{
+      errormsg=JSON.parse('{"errormsg":"Su usuario se encuentra bloqueado"}');
+      reject(errormsg);
+    }
+    });
+  });
+
+};
 };
 UserSchema.statics.findByToken=function(token){
   var Usuario=this;
