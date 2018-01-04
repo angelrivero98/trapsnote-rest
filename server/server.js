@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-
+var includes = require('array-includes');
 var md5 = require('md5');
 const _ = require('lodash');
 var {mongoose} = require('./db/mongoose');
@@ -124,7 +124,11 @@ app.post('/:username/tareas', (req, res) => { //Registrar tareas
   tarea.save().then((doc) => {
     Categoria.findOne({nombre :tarea.categoria }).then((cat) =>{
       if (!cat){
+        categoria.cont ++;
         categoria.save();
+
+      }else {
+        Categoria.findOneAndUpdate({nombre:tarea.categoria},{$inc : {cont : 1}}).then((cat));
       }
     });
     res.status(200).send(doc);
@@ -149,18 +153,19 @@ app.delete('/:username/tareas/:id', (req,res) => { //Eliminar tarea
     return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
     }
     Tarea.findByIdAndRemove(id).then((tarea) => { //Se realiza la busqueda de la tarea por ID
-    if (!tarea) {
-      errormsg=JSON.parse('{"errormsg":"La tarea no existe"}');
-      return res.status(404).send(errormsg); // Si la tarea no existe devuelve una respuesta 404
-    }
-    res.send({tarea}); // Si todo estuvo bien, devuelve el usuario
-  }).catch((e) => res.status(400).send());
+      if (!tarea) {
+        errormsg=JSON.parse('{"errormsg":"La tarea no existe"}');
+        return res.status(404).send(errormsg); // Si la tarea no existe devuelve una respuesta 404
+      }
+      Categoria.findOneAndUpdate({nombre:tarea.categoria},{$inc : {cont : -1}}).then((cat) => {});
+      return res.send({tarea}); // Si todo estuvo bien, devuelve el usuario
+    }).catch((e) => res.status(400).send());
 });
 
 app.patch('/:username/tareas/:id',(req,res) =>{ // Actualizar tarea por hacer
   var id = req.params.id; // el id lo pasamos como parametro para despues validarlo
   var errormsg;
-
+  var names = ["Estudios","Trabajo","Hogar","Actividad","Ejercicio","Plan","Informacion"];
   var body = _.pick(req.body,['nombre','descripcion','categoria','fechaLimite']); // agarramos los parametros que se pueden modificar
   if (!ObjectID.isValid(id)) {
   return res.status(404).send(); // Si el ID no es valido devuelve una respuesta 404
@@ -171,6 +176,10 @@ app.patch('/:username/tareas/:id',(req,res) =>{ // Actualizar tarea por hacer
       errormsg = JSON.parse('{"errormsg":"La fecha limite debe ser despues de la fecha actual"}');
     return res.status(400).send(errormsg); }
   }
+  if (!includes(names,body.categoria)){
+        errormsg = JSON.parse('{"errormsg":"La categoria no existe"}');
+        return res.status(400).send(errormsg);
+  }
   var categoria = new Categoria({ nombre: body.categoria });
   Tarea.findById(id).then((tarea) =>{
     if (!tarea) {
@@ -178,10 +187,16 @@ app.patch('/:username/tareas/:id',(req,res) =>{ // Actualizar tarea por hacer
       return res.status(404).send(errormsg); // Si la tarea no existe devuelve una respuesta 404
     }
     if (!tarea.completado){
+      var cTarea = tarea; // Tarea antes de ser modificada
       Tarea.findByIdAndUpdate(id, {$set: body},{new: true}).then((tarea) => { //Se realiza la busqueda de la tarea por ID
         Categoria.findOne({nombre :body.categoria }).then((cat) =>{
+        Categoria.findOneAndUpdate({nombre:cTarea.categoria},{$inc : {cont : -1}}).then((cat) => {});
           if (!cat){
+            categoria.cont ++;
             categoria.save();
+
+          }else {
+            Categoria.findOneAndUpdate({nombre:body.categoria},{$inc : {cont : 1}}).then((cat));
           }
         });
         res.send({tarea}); // Si todo estuvo bien, devuelve la tarea
@@ -232,8 +247,13 @@ app.get('/:username/tareas/:id',(req,res) =>{ //Consultar tarea por hacer
 });
 
 app.get('/categorias',(req,res) =>{
-  Categoria.find({activa : true}).then((categorias) =>{
-    res.send({categorias});
+  Categoria.update({cont : 0},{activa : false}, {multi: true}).then ((cat) => {}); // Chequeo que las categorias que no tengan tareas asignadas, las inactivo
+  Categoria.update( { cont: { $gte: 1 },activa : false } ,{activa : true},{multi : true}).then((categorias) =>{
+    Categoria.find({activa : true}).then((categorias) => {
+      res.send({categorias});
+    },(e) => {
+      res.status(400).send(e);
+    });
   }, (e) => {
     res.status(400).send(e);
   })
