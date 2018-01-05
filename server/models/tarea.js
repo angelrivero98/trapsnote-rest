@@ -1,6 +1,8 @@
 var mongoose = require("mongoose");
 const validator = require("validator");
 var jsValidate = require("js-validate");
+var names = ["Estudios","Trabajo","Hogar","Actividad","Ejercicio","Plan","Informacion"];
+var includes = require('array-includes');
 var validate = jsValidate.start();
 //Constructor de tareas
 var Tarea = mongoose.model('Tarea', {
@@ -14,7 +16,7 @@ var Tarea = mongoose.model('Tarea', {
     validator: (value)=>{
           return validate(value, 'alphanumeric _space_');
     },
-    message: '{VALUE} El nombre debe ser alfanumerica'
+    message: 'El nombre debe ser alfanumerica'
     }
   },
   descripcion: {
@@ -27,14 +29,19 @@ var Tarea = mongoose.model('Tarea', {
     validator: (value)=>{
           return validate(value, 'alphanumeric _space_');
     },
-    message: '{VALUE} La descripcion debe ser alfanumerica'
+    message: 'La descripcion debe ser alfanumerica'
     }
   },
   categoria: {
     type:String,
     trim: true,
     required: true,
-    minlength: 1
+    validate:{
+    validator: (value)=>{
+          return includes(names,value);
+    },
+    message: '{VALUE} La categoria no existe'
+    }
   },
   username: {
     type: String

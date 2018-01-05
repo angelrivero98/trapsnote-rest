@@ -4,6 +4,7 @@
   "description": "Version Final del repositorio",
   "main": "index.js",
   "dependencies": {
+    "array-includes": "^3.0.3",
     "body-parser": "^1.15.2",
     "controllers": "0.0.2",
     "express": "^4.14.0",

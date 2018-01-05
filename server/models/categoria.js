@@ -8,7 +8,11 @@ var Categoria = mongoose.model('Categoria',{
   activa:{
     type: Boolean,
     required:true,
-    default : true
+    default : false
+  },
+  cont : {
+    type : Number,
+    default : 0
   }
 });
 
