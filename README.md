@@ -20,6 +20,8 @@ Tareas ID: https://dry-forest-40048.herokuapp.com/:username/tareas/:id (GET para
 
 Categorias : https://dry-forest-40048.herokuapp.com/categorias (GET para ver las categorias)
 
+Categorias disponibles: "Estudios","Trabajo","Hogar","Actividad","Ejercicio","Plan","Informacion"
+
 
 :username "Va el username del usuario que desea ver las tareas"
 :id "El id de la tarea"
