@@ -221,7 +221,7 @@ app.put('/:username/tareas/:id',(req,res) =>{ //Marcar tarea como completada
       return res.status(404).send(errormsg); // Si la tarea no existe devuelve una respuesta 404
     }
     if (!tarea.completado){ // Si la tarea no esta completada entonces puedes marcarla como completada
-      Tarea.findByIdAndUpdate(id, {$set: body},{new: true}).then((tarea) => { //Se realiza la busqueda de la tarea por ID
+      Tarea.findByIdAndUpdate(id, {completado: body.completado},{new : true}).then((tarea) => { //Se realiza la busqueda de la tarea por ID
         res.send({tarea}); // Si todo estuvo bien, devuelve la tarea
       }).catch((e) => res.status(400).send());
     } else {
