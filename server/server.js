@@ -176,7 +176,7 @@ app.patch('/:username/tareas/:id',(req,res) =>{ // Actualizar tarea por hacer
       errormsg = JSON.parse('{"errormsg":"La fecha limite debe ser despues de la fecha actual"}');
     return res.status(400).send(errormsg); }
   }
-  if (!includes(names,body.categoria)){
+  if (!includes(names,body.categoria) && (body.categoria != null)){
         errormsg = JSON.parse('{"errormsg":"La categoria no existe"}');
         return res.status(400).send(errormsg);
   }
